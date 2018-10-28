@@ -1,0 +1,23 @@
+// GO_St11
+digraph {
+	graph [rankdir=LR]
+	EMPTY [label="" shape=plaintext]
+	B [label=B peripheries=1 shape=circle]
+	IF [label=IF peripheries=1 shape=circle]
+	B1 [label=B1 peripheries=1 shape=circle]
+	Real_I [label=Real_I peripheries=1 shape=circle]
+	A [label=A peripheries=1 shape=circle]
+	Real_F [label=Real_F peripheries=2 shape=circle]
+	EMPTY -> Real_I
+	A -> B [label="(1 0)"]
+	A -> A [label="(1 1)"]
+	IF -> A [label=0]
+	A -> B1 [label=0]
+	B -> IF [label=0]
+	IF -> IF [label=1]
+	B -> B1 [label=1]
+	B1 -> IF [label=0]
+	B1 -> B [label=1]
+	Real_I -> IF [label="\"\""]
+	IF -> Real_F [label="\"\""]
+}
