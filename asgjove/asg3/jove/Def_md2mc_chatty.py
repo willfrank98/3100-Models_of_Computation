@@ -67,6 +67,7 @@ reserved = {
    
 def t_ID(t):
     r'[a-zA-Z0-9#$%&()*+/=?@\[\\\]^_{}~]+'
+    #print("Got an ID: ", t.value)
     # Printable ASCII sans space,  quotations ` ' " and . : , ; - > < | !
     # See https://docs.python.org/3/howto/regex.html for Python Regex
     # See https://en.wikipedia.org/wiki/ASCII for printable ASCII
@@ -100,7 +101,7 @@ def t_NEWLINE(t):
 # http://www.eng.utah.edu/~cs3100/lectures/l14/ply-3.4/doc/ply.html
 def t_COMMENT(t):
     r'\!\!.*'
-    print("Got a Jove markdown comment")
+    #print("Got a Jove markdown comment")
     pass
     # No return value. Token discarded
     
@@ -261,6 +262,7 @@ def extend_rsltdict(D, key, val, Extend=False):
     
     
 def form_delta(line_attr_list, mc_type):
+    print("forming delta for: ", mc_type)
     """Helper for get_machine_components()
        ---
        Given the machine type, cull the needed info from line_attr_list
@@ -373,6 +375,7 @@ def form_delta(line_attr_list, mc_type):
 #=================================================================
 
 def get_machine_components(line_attr_list, mc_type):
+    print("Getting machine components for: ", mc_type)
     """Used in four top-level parser rules, namely
        p_dfa_md(), p_nfa_md(), p_pda_md() and p_tm_md()
        ---
@@ -428,6 +431,7 @@ def get_machine_components(line_attr_list, mc_type):
 # Some simple extractors 
 
 def is_init_st(id):
+    #print("Check if", id, "begins with i or I")
     """Used in p_one_line()
        ---
        Checks if id begins with i or I.
@@ -436,6 +440,7 @@ def is_init_st(id):
 
 
 def is_fin_st(id):
+    #print("Check if", id, "begins with f or if or IF")
     """Used in p_one_line()
        ---
        Checks if id begins with f or F or if or IF.
@@ -460,7 +465,7 @@ def is_fin_st(id):
 
 def p_you_are_hosed(t):
     '''md : error'''
-    print("Your are hosed due to a syntax error!")
+    print("You are hosed due to a syntax error!")
     global LINENO
     LINENO = -1 # restore sanity wrt future reporting of errors
     t[0] = ('ERROR', 'ERROR')
@@ -481,12 +486,14 @@ def p_dfa_md(t):
     
 def p_nfa_md(t):
     '''md : NFA lines'''
+    print("Parsed NFA keyword")
     global LINENO
     LINENO = -1 # restore for next error processing
     t[0] = ('NFA', get_machine_components(t[2], 'NFA'))
 
 def p_pda_md(t):
     '''md : PDA lines'''
+    print("Parsed PDA keyword")
     mc = get_machine_components(t[2], 'PDA')
     (From_s, To_s,
      G_in,   G_out,
@@ -499,6 +506,7 @@ def p_pda_md(t):
     
 def p_tm_md(t):
     '''md : TM lines'''
+    print("Parsed TM keyword")
     mc = get_machine_components(t[2], 'TM')
     (From_s, To_s,
      G_in,   G_out,
@@ -515,17 +523,18 @@ def p_tm_md(t):
     
 def p_lines1(t):
     '''lines : one_line'''
+    #print("Looking at last line")
     t[0] = [ t[1] ] # One line's attribute is a dict
     
 def p_lines2(t):
     '''lines : one_line lines'''
+    #print("Looking at a single line")
     one_line_attr = [ t[1] ]
     lines_attr    = t[2]
     t[0] = one_line_attr + lines_attr # List of line attrs
 
 def p_one_line(t):
     '''one_line : state COLON labels ARROW states'''
-    print("Parsed one line of Jove MD code, involving tokens COLON and ARROWS and other things in an MD line")
     lineattr  = default_line_attr()
     lineattr["FromState"] = t[1]
     lineattr["ToStates"]  = t[5]
@@ -541,6 +550,7 @@ def p_one_line(t):
     lineattr["HeadDirn"]  = t[3]["HeadDirn"]    
     #
     t[0] = lineattr
+    print("Parsed one line of Jove MD code. FromState:", t[1], ", ToStates:", t[5])
 
 def p_state(t):
     '''state : ID'''
@@ -615,6 +625,7 @@ def p_one_label2(t):
 def dirn_is_ok(dirn):
     """Ensure that the TM head direction is OK.
     """
+    print("Ensuring TM head direction is OK")
     return dirn in set({'L','R','S'})
 
 def p_one_label3(t):

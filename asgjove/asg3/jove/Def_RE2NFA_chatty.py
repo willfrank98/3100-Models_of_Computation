@@ -94,13 +94,13 @@ precedence = (
 
 def p_expression_plus(t):
     '''expression : expression PLUS catexp'''
-    print("Got a plus token")
+    #print("Got a plus token")
     t[0] = mk_plus_nfa(t[1], t[3]) # Union of the two NFAs is returned
     
 def mk_plus_nfa(N1, N2):
     """Given two NFAs, return their union.
     """
-    print("Given the parse of two NFA, making one PLUS-connected NFA")
+    print("Got a plus token, making one PLUS-connected NFA")
     delta_accum = dict({})
     delta_accum.update(N1["Delta"])
     delta_accum.update(N2["Delta"]) # Simply accumulate the transitions
@@ -116,6 +116,7 @@ def mk_plus_nfa(N1, N2):
     
 def p_expression_plus_id(t):
     '''expression : catexp'''
+    #print("Got a C token")
     # Simply inherit the attribute from t[1] and pass on    
     t[0] = t[1] 
 
@@ -123,9 +124,11 @@ def p_expression_plus_id(t):
 
 def p_expression_cat(t):
     '''catexp :  catexp ordyexp'''
+    #print("Got C -> C O")
     t[0] = mk_cat_nfa(t[1], t[2])
 
 def mk_cat_nfa(N1, N2):
+    print("Performing NFA concatination for two adjacent expressions")
     delta_accum = dict({}) 
     delta_accum.update(N1["Delta"])
     delta_accum.update(N2["Delta"])
@@ -154,6 +157,7 @@ def mk_cat_nfa(N1, N2):
 
 def p_expression_cat_id(t):
     '''catexp :  ordyexp'''
+    #print("C -> O")
     # Simply inherit the attribute from t[1] and pass on
     t[0] = t[1]
 
@@ -161,6 +165,7 @@ def p_expression_cat_id(t):
 
 def p_expression_ordy_star(t):
     'ordyexp : ordyexp STAR'
+    #print("Got a star token")
     t[0] = mk_star_nfa(t[1])
 
 def mk_star_nfa(N):
@@ -171,6 +176,7 @@ def mk_star_nfa(N):
     # 3) Make N[F] non-final
     # 4) Spin back from every state in N[F] to Q0
     #
+    print("Got a star token, performing NFA star-ing")
     delta_accum = dict({})
     IF = NxtStateStr()
     Q0 = set({ IF }) # new set of start + final states
@@ -197,6 +203,7 @@ def mk_star_nfa(N):
 
 def p_expression_ordy_paren(t):
     'ordyexp : LPAREN expression RPAREN'
+    print("Got paren tokens")
     # Simply inherit the attribute from t[2] and pass on
     t[0] = t[2]
 
@@ -204,6 +211,7 @@ def p_expression_ordy_paren(t):
     
 def p_expression_ordy_eps(t):
     'ordyexp : EPS'
+    print("Got epsilon token")
     t[0] = mk_eps_nfa()
 
 def mk_eps_nfa():
@@ -221,6 +229,7 @@ def mk_eps_nfa():
 
 def p_expression_ordy_str(t):
     'ordyexp : STR'
+    print("Got a string token:", t[1])
     t[0] = mk_symbol_nfa(t[1])
 
 def mk_symbol_nfa(a):
